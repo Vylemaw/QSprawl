@@ -689,15 +689,15 @@ void SV_ReadClientMove (usercmd_t *move)
 // read buttons
 	bits = MSG_ReadShort ();
 	host_client->edict->v.button0 = bits & 1; //attack
-	host_client->edict->v.button2 = (bits & 2) >> 1; //jump
+	host_client->edict->v.button2 = (bits >> 1) & 1; //jump
 // qsprawl new buttons
-	host_client->edict->v.button1 = (bits & 4) >> 2; // use
-	host_client->edict->v.b_attack2 = (bits & 8) >> 3;
-	host_client->edict->v.b_slide = (bits & 16) >> 4;
-	host_client->edict->v.b_reload = (bits & 32) >> 5;
-	host_client->edict->v.b_melee = (bits & 64) >> 6;
-	host_client->edict->v.b_kick = (bits & 128) >> 7;
-	host_client->edict->v.b_adrenaline = (bits & 256) >> 8;
+	host_client->edict->v.button1 = (bits >> 2) & 1; // use
+	host_client->edict->v.b_attack2 = (bits >> 3) & 1;
+	host_client->edict->v.b_slide = (bits >> 4) & 1;
+	host_client->edict->v.b_reload = (bits >> 5) & 1;
+	host_client->edict->v.b_melee = (bits >> 6) & 1;
+	host_client->edict->v.b_kick = (bits >> 7) & 1;
+	host_client->edict->v.b_adrenaline = (bits >> 8) & 1;
 
 	host_client->edict->v.player_inputs = 0;
 	if (bits & 512) //forward
@@ -708,6 +708,8 @@ void SV_ReadClientMove (usercmd_t *move)
 		host_client->edict->v.player_inputs += 4;
 	if (bits & 4096) //left
 		host_client->edict->v.player_inputs += 8;
+
+	host_client->edict->v.b_dodge = (bits >> 13) & 1;
 
 	i = MSG_ReadByte ();
 	if (i)

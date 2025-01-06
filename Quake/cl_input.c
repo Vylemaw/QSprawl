@@ -58,7 +58,7 @@ kbutton_t	in_lookup, in_lookdown, in_moveleft, in_moveright;
 kbutton_t	in_strafe, in_speed, in_use, in_jump, in_attack;
 kbutton_t	in_up, in_down;
 //qsprawl
-kbutton_t	in_attack2, in_slide, in_reload, in_melee, in_kick, in_adrenaline;
+kbutton_t	in_attack2, in_slide, in_reload, in_melee, in_kick, in_adrenaline, in_dodge;
 
 int			in_impulse;
 
@@ -191,6 +191,8 @@ void IN_KickDown(void) { KeyDown(&in_kick); }
 void IN_KickUp(void) { KeyUp(&in_kick); }
 void IN_AdrenalineDown(void) { KeyDown(&in_adrenaline); }
 void IN_AdrenalineUp(void) { KeyUp(&in_adrenaline); }
+void IN_DodgeDown(void) { KeyDown(&in_dodge); }
+void IN_DodgeUp(void) { KeyUp(&in_dodge); }
 
 
 /*
@@ -439,49 +441,53 @@ void CL_SendMove (const usercmd_t *cmd)
 		in_attack.state &= ~2;
 
 		if (in_jump.state & 3)
-			bits |= 2;
+			bits |= 1 << 1;
 		in_jump.state &= ~2;
 	//qsprawl new keys
 		if (in_use.state & 3)
-			bits |= 4;
+			bits |= 1 << 2;
 		in_use.state &= ~2;
 
 		if (in_attack2.state & 3)
-			bits |= 8;
+			bits |= 1 << 3;
 		in_attack2.state &= ~2;
 
 		if (in_slide.state & 3)
-			bits |= 16;
+			bits |= 1 << 4;
 		in_slide.state &= ~2;
 
 		if (in_reload.state & 3)
-			bits |= 32;
+			bits |= 1 << 5;
 		in_reload.state &= ~2;
 
 		if (in_melee.state & 3)
-			bits |= 64;
+			bits |= 1 << 6;
 		in_melee.state &= ~2;
 
 		if (in_kick.state & 3)
-			bits |= 128;
+			bits |= 1 << 7;
 		in_kick.state &= ~2;
 
 		if (in_adrenaline.state & 3)
-			bits |= 256;
+			bits |= 1 << 8;
 		in_adrenaline.state &= ~2;
 
-		if (in_forward.state & 3)
-			bits |= 512;
+		if ((in_forward.state & 3) | (cl.pendingcmd.forwardmove > 0))
+			bits |= 1 << 9;
 		in_forward.state &= ~2;
-		if (in_back.state & 3)
-			bits |= 1024;
+		if ((in_back.state & 3) | (cl.pendingcmd.forwardmove < 0))
+			bits |= 1 << 10;
 		in_back.state &= ~2;
-		if (in_moveright.state & 3)
-			bits |= 2048;
+		if ((in_moveright.state & 3) | (cl.pendingcmd.sidemove > 0))
+			bits |= 1 << 11;
 		in_moveright.state &= ~2;
-		if (in_moveleft.state & 3)
-			bits |= 4096;
+		if ((in_moveleft.state & 3) | (cl.pendingcmd.sidemove < 0))
+			bits |= 1 << 12;
 		in_moveleft.state &= ~2;
+
+		if (in_dodge.state & 3)
+			bits |= 1 << 13;
+		in_dodge.state &= ~2;
 
 		MSG_WriteShort (&buf, bits);
 
@@ -564,5 +570,7 @@ void CL_InitInput (void)
 	Cmd_AddCommand("-kick", IN_KickUp);
 	Cmd_AddCommand("+adrenaline", IN_AdrenalineDown);
 	Cmd_AddCommand("-adrenaline", IN_AdrenalineUp);
+	Cmd_AddCommand("+dodge", IN_DodgeDown);
+	Cmd_AddCommand("-dodge", IN_DodgeUp);
 }
 

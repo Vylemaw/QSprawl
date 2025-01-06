@@ -4705,6 +4705,7 @@ static const char* const bindnames[][2] =
 	{"+melee",			"Quick melee"},
 	//{"+kick",			"Kick"},
 	{"+adrenaline",		"Adrenaline"},
+	{"+dodge",		    "Dodge"},
 	//{"+reload",			"Reload"},
 	//{"+use",			"Use"},
 	{"impulse 10",		"Next weapon"},
