@@ -472,16 +472,17 @@ void CL_SendMove (const usercmd_t *cmd)
 			bits |= 1 << 8;
 		in_adrenaline.state &= ~2;
 
-		if ((in_forward.state & 3) | (cl.pendingcmd.forwardmove > 0))
+		qboolean forward_not_back = fabs(cl.pendingcmd.forwardmove) > fabs(cl.pendingcmd.sidemove);
+		if ((in_forward.state & 3) | (forward_not_back && (cl.pendingcmd.forwardmove > 0)))
 			bits |= 1 << 9;
 		in_forward.state &= ~2;
-		if ((in_back.state & 3) | (cl.pendingcmd.forwardmove < 0))
+		if ((in_back.state & 3) | (forward_not_back && (cl.pendingcmd.forwardmove < 0)))
 			bits |= 1 << 10;
 		in_back.state &= ~2;
-		if ((in_moveright.state & 3) | (cl.pendingcmd.sidemove > 0))
+		if ((in_moveright.state & 3) | (!forward_not_back && (cl.pendingcmd.sidemove > 0)))
 			bits |= 1 << 11;
 		in_moveright.state &= ~2;
-		if ((in_moveleft.state & 3) | (cl.pendingcmd.sidemove < 0))
+		if ((in_moveleft.state & 3) | (!forward_not_back && (cl.pendingcmd.sidemove < 0)))
 			bits |= 1 << 12;
 		in_moveleft.state &= ~2;
 
